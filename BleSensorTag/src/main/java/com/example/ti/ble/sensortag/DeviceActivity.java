@@ -54,6 +54,7 @@ package com.example.ti.ble.sensortag;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -106,6 +107,15 @@ import com.example.ti.util.PreferenceWR;
 
 
 @SuppressLint("InflateParams") public class DeviceActivity extends ViewPagerActivity {
+    //For send to myankle
+    public void dataWriter(String key, String value)
+    {
+        SharedPreferences prefs = getSharedPreferences("demopref",Context.MODE_WORLD_READABLE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(key, value);
+        editor.commit();
+    }
+
 	// Log
 	// private static String TAG = "DeviceActivity";
 
@@ -574,6 +584,7 @@ import com.example.ti.util.PreferenceWR;
                                     Log.d("DeviceActivity","Found IR Temperature !");
                                 }
                                 if (SensorTagMovementProfile.isCorrectService(s)) {
+                                    Log.d("Mshzhb","Found Motion !");
                                     SensorTagMovementProfile mov = new SensorTagMovementProfile(context,mBluetoothDevice,s,mBtLeService);
                                     mProfiles.add(mov);
                                     if (nrNotificationsOn < maxNotifications) {
@@ -585,17 +596,34 @@ import com.example.ti.util.PreferenceWR;
                                     }
                                     Log.d("DeviceActivity","Found Motion !");
                                 }
+
                                 if (SensorTagAccelerometerProfile.isCorrectService(s)) {
+                                    Log.d("Mshzhb","Found Motion !");
                                     SensorTagAccelerometerProfile acc = new SensorTagAccelerometerProfile(context,mBluetoothDevice,s,mBtLeService);
                                     mProfiles.add(acc);
                                     if (nrNotificationsOn < maxNotifications) {
                                         acc.configureService();
                                         nrNotificationsOn++;
+                                        //output to MyAnkle
+                                        /*
+                                        Map<String,String> map = acc.getMQTTMap();
+                                        Iterator it=map.entrySet().iterator();
+
+                                        String key;
+                                        String value;
+                                        while(it.hasNext()){
+                                            Map.Entry entry = (Map.Entry)it.next();
+                                            key=entry.getKey().toString();
+                                            value=entry.getValue().toString();
+                                            Log.d(key,value);
+                                            dataWriter(key, value);
+                                        }
+                                        */
                                     }
                                     else {
                                         acc.grayOutCell(true);
                                     }
-                                    Log.d("DeviceActivity","Found Motion !");
+                                    Log.d("DeviceActivity","Found ACC Motion !");
 
                                 }
                                 if (SensorTagDisplayProfile.isCorrectService(s)) {

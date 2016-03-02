@@ -61,6 +61,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.text.Html;
 import android.util.Log;
 import android.widget.CompoundButton;
@@ -71,11 +72,12 @@ import com.example.ti.ble.common.GenericBluetoothProfile;
 import com.example.ti.util.Point3D;
 
 public class SensorTagMovementProfile extends GenericBluetoothProfile {
-	
+    Context context;
 	public SensorTagMovementProfile(Context con,BluetoothDevice device,BluetoothGattService service,BluetoothLeService controller) {
-		super(con,device,service,controller);
+
+        super(con,device,service,controller);
 		this.tRow =  new SensorTagMovementTableRow(con);
-		
+        context = con;
 		List<BluetoothGattCharacteristic> characteristics = this.mBTService.getCharacteristics();
 		
 		for (BluetoothGattCharacteristic c : characteristics) {
@@ -188,11 +190,19 @@ public class SensorTagMovementProfile extends GenericBluetoothProfile {
 	}
     @Override
     public Map<String,String> getMQTTMap() {
+        Log.d("Mshzhb","getMQTTMap");
         Point3D v = Sensor.MOVEMENT_ACC.convert(this.dataC.getValue());
         Map<String,String> map = new HashMap<String, String>();
         map.put("acc_x",String.format("%.2f",v.x));
         map.put("acc_y",String.format("%.2f",v.y));
         map.put("acc_z",String.format("%.2f",v.z));
+        //for MyAnkle
+        Log.d("Mshzhb", String.format("%.2f", v.x));
+        dataWriter("acc_x", String.format("%.2f", v.x));
+        dataWriter("acc_y", String.format("%.2f", v.y));
+        dataWriter("acc_z", String.format("%.2f", v.z));
+
+
         v = Sensor.MOVEMENT_GYRO.convert(this.dataC.getValue());
         map.put("gyro_x",String.format("%.2f",v.x));
         map.put("gyro_y",String.format("%.2f",v.y));
@@ -203,4 +213,13 @@ public class SensorTagMovementProfile extends GenericBluetoothProfile {
         map.put("compass_z",String.format("%.2f",v.z));
         return map;
     }
+
+    //For send to myankle
+    public void dataWriter(String key, String value) {
+        SharedPreferences prefs = context.getSharedPreferences("demopref",Context.MODE_WORLD_READABLE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(key, value);
+        editor.commit();
+    }
+
 }

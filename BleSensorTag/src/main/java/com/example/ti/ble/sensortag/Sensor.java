@@ -60,6 +60,7 @@ import java.util.List;
 import java.util.UUID;
 import com.example.ti.util.Point3D;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.util.Log;
 
 
 /**
@@ -164,6 +165,7 @@ public enum Sensor {
 			 * The z value is multiplied with -1 to coincide with how we have arbitrarily defined the positive y direction. (illustrated by the apps accelerometer
 			 * image)
 			 */
+            Log.d("Mshzhb", "Acceleration");
 			DeviceActivity da = DeviceActivity.getInstance();
 
 			if (da.isSensorTag2()) {
@@ -172,14 +174,16 @@ public enum Sensor {
 
 				int x = (value[0]<<8) + value[1];
 				int y = (value[2]<<8) + value[3];
-				int z = (value[4]<<8) + value[5]; 
+				int z = (value[4]<<8) + value[5];
+
+                Log.d("SensorType", "SensorTag2");
 				return new Point3D(x / SCALE, y / SCALE, z / SCALE);
 			} else {
 				Point3D v;
 				Integer x = (int) value[0];
 				Integer y = (int) value[1];
 				Integer z = (int) value[2] * -1;
-
+                Log.d("SensorType", "SensorTag3");
 				if (da.firmwareRevision().contains("1.5"))
 				{
 					// Range 8G

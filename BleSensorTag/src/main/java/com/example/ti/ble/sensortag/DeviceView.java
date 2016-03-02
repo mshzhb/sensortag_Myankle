@@ -79,8 +79,8 @@ import android.widget.TableRow;
 	View view;
 	
 	public DeviceView() {
-		super();
-	}
+			super();
+		}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

@@ -111,6 +111,9 @@ public class SensorTagAccelerometerProfile extends GenericBluetoothProfile {
 		this.tRow.title.setText(GattInfo.uuidToName(UUID.fromString(this.dataC.getUuid().toString())));
 		this.tRow.uuidLabel.setText(this.dataC.getUuid().toString());
 		this.tRow.value.setText("X:0.00G, Y:0.00G, Z:0.00G");
+
+        Point3D v = Sensor.ACCELEROMETER.convert(this.dataC.getValue());
+        Log.d("Mshzhb",String.format("X:%.2fG, Y:%.2fG, Z:%.2fG", v.x,v.y,v.z));
 		
 	}
 	
@@ -122,6 +125,7 @@ public class SensorTagAccelerometerProfile extends GenericBluetoothProfile {
 	}
     @Override
 	public void didUpdateValueForCharacteristic(BluetoothGattCharacteristic c) {
+        Log.d("Mshzhb",  "didUpdateValueForCharacteristic");
 			if (c.equals(this.dataC)){
 				Point3D v = Sensor.ACCELEROMETER.convert(this.dataC.getValue());
 				if (this.tRow.config == false) this.tRow.value.setText(String.format("X:%.2fG, Y:%.2fG, Z:%.2fG", v.x,v.y,v.z));
@@ -132,11 +136,13 @@ public class SensorTagAccelerometerProfile extends GenericBluetoothProfile {
 	}
     @Override
     public Map<String,String> getMQTTMap() {
+        Log.d("Mshzhb",  "getMQTTMap");
         Point3D v = Sensor.ACCELEROMETER.convert(this.dataC.getValue());
         Map<String,String> map = new HashMap<String, String>();
         map.put("acc_x", String.format("%.2f", v.x));
         map.put("acc_y",String.format("%.2f",v.y));
         map.put("acc_z",String.format("%.2f",v.z));
+        Log.d("acc_x",  String.format("%.2f", v.x));
         return map;
     }
 }

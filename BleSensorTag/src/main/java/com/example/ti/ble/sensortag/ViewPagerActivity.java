@@ -65,6 +65,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 // import android.util.Log;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -85,7 +86,7 @@ public class ViewPagerActivity extends FragmentActivity {
   protected Menu optionsMenu;
   private MenuItem refreshItem;
   protected boolean mBusy;
-
+  String TAG = "Table_Test";
   protected ViewPagerActivity() {
     // Log.d(TAG, "construct");
     mThis = this;
@@ -95,7 +96,7 @@ public class ViewPagerActivity extends FragmentActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    // Log.d(TAG, "onCreate");
+     Log.d(TAG, "onCreate");
     super.onCreate(savedInstanceState);
     setContentView(mResourceFragmentPager);
 
@@ -110,7 +111,7 @@ public class ViewPagerActivity extends FragmentActivity {
     mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
       @Override
       public void onPageSelected(int n) {
-        // Log.d(TAG, "onPageSelected: " + n);
+         Log.d(TAG, "onPageSelected: " + n);
         actionBar.setSelectedNavigationItem(n);
       }
     });
@@ -139,7 +140,7 @@ public class ViewPagerActivity extends FragmentActivity {
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    // Log.d(TAG, "onOptionsItemSelected");
+     Log.d(TAG, "onOptionsItemSelected");
     // Handle presses on the action bar items
     switch (item.getItemId()) {
     // Respond to the action bar's Up/Home button
@@ -203,7 +204,7 @@ public class ViewPagerActivity extends FragmentActivity {
       mTitles.add(title);
       actionBar.addTab(actionBar.newTab().setText(title).setTabListener(tabListener));
       notifyDataSetChanged();
-      // Log.d(TAG, "Tab: " + title);
+      Log.d(TAG, "Tab: " + title);
     }
 
     @Override
@@ -231,19 +232,19 @@ public class ViewPagerActivity extends FragmentActivity {
 
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
       int n = tab.getPosition();
-      // Log.d(TAG, "onTabSelected: " + n);
+       Log.d(TAG, "onTabSelected: " + n);
       mCurrentTab = n;
       mViewPager.setCurrentItem(n);
     }
 
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-      // int n = tab.getPosition();
-      // Log.d(TAG, "onTabUnselected: " + n);
+       int n = tab.getPosition();
+       Log.d(TAG, "onTabUnselected: " + n);
     }
 
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-      // int n = tab.getPosition();
-      // Log.d(TAG, "onTabReselected: " + n);
+       int n = tab.getPosition();
+       Log.d(TAG, "onTabReselected: " + n);
     }
   };
 }
