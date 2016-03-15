@@ -52,17 +52,23 @@
  **************************************************************************************************/
 package com.example.ti.ble.sensortag;
 
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
+import java.io.*;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.text.Html;
+import android.text.format.Time;
 import android.util.Log;
 import android.widget.CompoundButton;
 
@@ -71,8 +77,10 @@ import com.example.ti.ble.common.GattInfo;
 import com.example.ti.ble.common.GenericBluetoothProfile;
 import com.example.ti.util.Point3D;
 
-public class SensorTagMovementProfile extends GenericBluetoothProfile {
+public class SensorTagMovementProfile extends GenericBluetoothProfile  {
     Context context;
+    public static float BN = 0;
+    ServerSocket s ;
 	public SensorTagMovementProfile(Context con,BluetoothDevice device,BluetoothGattService service,BluetoothLeService controller) {
 
         super(con,device,service,controller);
@@ -118,6 +126,20 @@ public class SensorTagMovementProfile extends GenericBluetoothProfile {
             }
         });
 		this.tRow.periodBar.setProgress(100);
+
+
+
+        //server
+        try{
+            s= new ServerSocket(5432);
+            new ServerThread(s).start();
+        }
+        catch(IOException e)
+        {
+            System.out.println(e);
+        }
+
+
 	}
 	
 	public static boolean isCorrectService(BluetoothGattService service) {
@@ -142,7 +164,7 @@ public class SensorTagMovementProfile extends GenericBluetoothProfile {
             Log.d("SensorTagMovementProfile","Sensor notification enable failed: " + this.configC.getUuid().toString() + " Error: " + error);
         }
 
-		this.periodWasUpdated(1000);
+		this.periodWasUpdated(100);
         this.isEnabled = true;
 	}
 	@Override 
@@ -193,15 +215,27 @@ public class SensorTagMovementProfile extends GenericBluetoothProfile {
         Log.d("Mshzhb","getMQTTMap");
         Point3D v = Sensor.MOVEMENT_ACC.convert(this.dataC.getValue());
         Map<String,String> map = new HashMap<String, String>();
-        map.put("acc_x",String.format("%.2f",v.x));
-        map.put("acc_y",String.format("%.2f",v.y));
+        map.put("acc_x", String.format("%.2f", v.x));
+        map.put("acc_y", String.format("%.2f", v.y));
         map.put("acc_z",String.format("%.2f",v.z));
         //for MyAnkle
-        Log.d("Mshzhb", String.format("%.2f", v.x));
-        dataWriter("acc_x", String.format("%.2f", v.x));
-        dataWriter("acc_y", String.format("%.2f", v.y));
-        dataWriter("acc_z", String.format("%.2f", v.z));
+        float x= (float)v.x*9.8f;
+        float y= (float)v.y*9.8f;
+        float z= (float)v.z*9.8f;
+        dataWriter("acc_x",x);
+        dataWriter("acc_y",y);
+        dataWriter("acc_z",z);
 
+
+       // double tmp = x * x + y * y + z * z - 9.80 * 9.80;
+       // BN = (float) Math.sqrt(tmp);
+       // Intent intent = new Intent("MyCustomIntent");
+
+
+      //  intent.putExtra("message", String.valueOf(BN));
+      //  intent.setAction("edu.utoronto.cimsah.myankle.Game.A_CUSTOM_INTENT");
+      //  context.sendBroadcast(intent);
+      //  Log.d("Mshzhb",String.valueOf(BN));
 
         v = Sensor.MOVEMENT_GYRO.convert(this.dataC.getValue());
         map.put("gyro_x",String.format("%.2f",v.x));
@@ -215,11 +249,14 @@ public class SensorTagMovementProfile extends GenericBluetoothProfile {
     }
 
     //For send to myankle
-    public void dataWriter(String key, String value) {
-        SharedPreferences prefs = context.getSharedPreferences("demopref",Context.MODE_WORLD_READABLE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(key, value);
-        editor.commit();
-    }
+    public void dataWriter(String key, float value) {
+
+        SharedPreferences preferencesWriter = context.getSharedPreferences("Myankle_IT_sensor", Context.MODE_WORLD_READABLE);
+        SharedPreferences.Editor editor = preferencesWriter.edit();
+        editor.putFloat(key,value);
+        editor.apply();
+        Log.d("Mshzhb", "Send "+key+" : "+value);
+        }
+
 
 }
