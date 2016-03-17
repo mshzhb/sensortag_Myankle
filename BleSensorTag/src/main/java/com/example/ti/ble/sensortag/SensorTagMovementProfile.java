@@ -99,8 +99,9 @@ public class SensorTagMovementProfile extends GenericBluetoothProfile  {
 				this.periodC = c;
 			}
 		}
-		
-		
+
+        //Thread
+
 		this.tRow.setIcon(this.getIconPrefix(), this.dataC.getUuid().toString());
 		
 		this.tRow.title.setText(GattInfo.uuidToName(UUID.fromString(this.dataC.getUuid().toString())));
@@ -257,6 +258,22 @@ public class SensorTagMovementProfile extends GenericBluetoothProfile  {
         editor.apply();
         Log.d("Mshzhb", "Send "+key+" : "+value);
         }
+
+    public void run() {
+        Point3D v = Sensor.MOVEMENT_ACC.convert(this.dataC.getValue());
+        Map<String,String> map = new HashMap<String, String>();
+        map.put("acc_x", String.format("%.2f", v.x));
+        map.put("acc_y", String.format("%.2f", v.y));
+        map.put("acc_z",String.format("%.2f",v.z));
+        //for MyAnkle
+        float x= (float)v.x*9.8f;
+        float y= (float)v.y*9.8f;
+        float z= (float)v.z*9.8f;
+        dataWriter("acc_x",x);
+        dataWriter("acc_y",y);
+        dataWriter("acc_z",z);
+    }
+
 
 
 }
